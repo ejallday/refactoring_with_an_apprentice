@@ -10,11 +10,11 @@ feature 'teacher adding an assignment' do
     visit new_teacher_assignment_path(as: teacher)
 
     select 'Science', from: :assignment_course_id
-    fill_in :assignment_name, with: 'Pop Quiz'
-    fill_in :assignment_description, with: 'I hope you studied!'
+    fill_in_text_field(:assignment, :name, 'Pop Quiz')
+    fill_in_text_field(:assignment, :description, 'I hope you studied!')
     select_date(:assignment, :assigned_on, assigned_on)
     select_date(:assignment, :due_on, due_on)
-    fill_in :assignment_points_possible, with: 100
+    fill_in_text_field(:assignment,:points_possible, 100)
     click_button I18n.t('helpers.submit.create', model: 'Assignment')
 
     expect(current_path).to eq(teacher_assignments_path)
@@ -24,6 +24,10 @@ feature 'teacher adding an assignment' do
     expect(page).to have_content('Assigned on: January 15, 2014')
     expect(page).to have_content('Due on: January 17, 2014')
     expect(page).to have_content('Points possible: 100')
+  end
+
+  def fill_in_text_field(prefix, field, value)
+    fill_in "#{ prefix }_#{ field }", with: value
   end
 
   def select_date(prefix, field, date)
