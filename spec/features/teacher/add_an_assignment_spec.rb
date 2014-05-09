@@ -9,12 +9,14 @@ feature 'teacher adding an assignment' do
 
     visit new_teacher_assignment_path(as: teacher)
 
-    select_from_dropdown(:assignment, :course_id, 'Science')
-    fill_in_text_field(:assignment, :name, 'Pop Quiz')
-    fill_in_text_field(:assignment, :description, 'I hope you studied!')
-    select_date(:assignment, :assigned_on, assigned_on)
-    select_date(:assignment, :due_on, due_on)
-    fill_in_text_field(:assignment,:points_possible, 100)
+    within_form(:assignment) do |prefix|
+      select_from_dropdown(prefix, :course_id, 'Science')
+      fill_in_text_field(prefix, :name, 'Pop Quiz')
+      fill_in_text_field(prefix, :description, 'I hope you studied!')
+      select_date(prefix, :assigned_on, assigned_on)
+      select_date(prefix, :due_on, due_on)
+      fill_in_text_field(prefix,:points_possible, 100)
+    end
     click_button I18n.t('helpers.submit.create', model: 'Assignment')
 
     expect(current_path).to eq(teacher_assignments_path)
@@ -38,5 +40,9 @@ feature 'teacher adding an assignment' do
 
   def select_from_dropdown(prefix, field, value)
     select value, from: :"#{ prefix }_#{ field }"
+  end
+
+  def within_form(prefix, &block)
+    yield prefix
   end
 end
