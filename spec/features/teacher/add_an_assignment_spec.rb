@@ -20,8 +20,8 @@ feature 'teacher adding an assignment' do
         assigned_on: assigned_on,
         due_on: due_on
       )
+      f.submit(:create)
     end
-    click_button I18n.t('helpers.submit.create', model: 'Assignment')
 
     expect(current_path).to eq(teacher_assignments_path)
     expect(page).to have_content('Course: Science')
@@ -32,14 +32,13 @@ feature 'teacher adding an assignment' do
     expect(page).to have_content('Points possible: 100')
   end
 
-
   def within_form(prefix, &block)
     completion_helper = FormCompletionHelper.new(form_prefix, self)
     yield completion_helper
   end
 
   class FormCompletionHelper
-    delegate :select, :fill_in, to: :context
+    delegate :select, :fill_in, :click_button, to: :context
 
     def initialize(prefix, context)
       @prefix = prefix
@@ -69,7 +68,16 @@ feature 'teacher adding an assignment' do
     end
     alias :select_from_dropdowns :select_from_dropdown
 
+    def submit(create_or_update)
+      raise InvalidArgumentException unless [:create, :update].include?(create_or_update.to_sym)
+      click_button I18n.t("helpers.submit.#{ create_or_update }", model: model_name)
+    end
+
     private
+
+    def model_name
+      prefix.to_s.capitalize
+    end
 
     attr_reader :prefix, :context
   end
