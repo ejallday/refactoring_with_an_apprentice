@@ -9,7 +9,7 @@ feature 'teacher adding an assignment' do
 
     visit new_teacher_assignment_path(as: teacher)
 
-    select 'Science', from: :assignment_course_id
+    select_from_dropdown(:assignment, :course_id, 'Science')
     fill_in_text_field(:assignment, :name, 'Pop Quiz')
     fill_in_text_field(:assignment, :description, 'I hope you studied!')
     select_date(:assignment, :assigned_on, assigned_on)
@@ -34,5 +34,9 @@ feature 'teacher adding an assignment' do
     select date.year, from: :"#{ prefix }_#{ field }_1i"
     select date.strftime('%B'), from: :"#{ prefix }_#{ field }_2i"
     select date.day, from: :"#{ prefix }_#{ field }_3i"
+  end
+
+  def select_from_dropdown(prefix, field, value)
+    select value, from: :"#{ prefix }_#{ field }"
   end
 end
