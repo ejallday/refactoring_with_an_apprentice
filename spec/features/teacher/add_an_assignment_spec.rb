@@ -3,10 +3,7 @@ require 'spec_helper'
 feature 'teacher adding an assignment' do
   scenario 'can create an assignment with valid attributes' do
     teacher = create(:teacher)
-    course1 = create(:course, name: 'Math', teacher: teacher)
-    course2 = create(:course, name: 'Science', teacher: teacher)
-    course3 = create(:course, name: 'History', teacher: teacher)
-    course4 = create(:course, name: 'Quantum Physics', teacher: teacher)
+    create(:course, name: 'Science', teacher: teacher)
 
     visit new_teacher_assignment_path(as: teacher)
 
