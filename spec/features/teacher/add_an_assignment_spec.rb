@@ -9,13 +9,13 @@ feature 'teacher adding an assignment' do
 
     visit new_teacher_assignment_path(as: teacher)
 
-    within_form(:assignment) do |prefix|
-      select_from_dropdown(prefix, :course_id, 'Science')
-      fill_in_text_field(prefix, :name, 'Pop Quiz')
-      fill_in_text_field(prefix, :description, 'I hope you studied!')
-      select_date(prefix, :assigned_on, assigned_on)
-      select_date(prefix, :due_on, due_on)
-      fill_in_text_field(prefix,:points_possible, 100)
+    within_form(:assignment) do |f|
+      f.select_from_dropdown(:course_id, 'Science')
+      f.fill_in_text_field(:name, 'Pop Quiz')
+      f.fill_in_text_field(:description, 'I hope you studied!')
+      f.fill_in_text_field(:points_possible, 100)
+      f.select_date(:assigned_on, assigned_on)
+      f.select_date(:due_on, due_on)
     end
     click_button I18n.t('helpers.submit.create', model: 'Assignment')
 
@@ -28,21 +28,36 @@ feature 'teacher adding an assignment' do
     expect(page).to have_content('Points possible: 100')
   end
 
-  def fill_in_text_field(prefix, field, value)
-    fill_in "#{ prefix }_#{ field }", with: value
-  end
-
-  def select_date(prefix, field, date)
-    select date.year, from: :"#{ prefix }_#{ field }_1i"
-    select date.strftime('%B'), from: :"#{ prefix }_#{ field }_2i"
-    select date.day, from: :"#{ prefix }_#{ field }_3i"
-  end
-
-  def select_from_dropdown(prefix, field, value)
-    select value, from: :"#{ prefix }_#{ field }"
-  end
 
   def within_form(prefix, &block)
-    yield prefix
+    completion_helper = FormCompletionHelper.new(form_prefix, self)
+    yield completion_helper
+  end
+
+  class FormCompletionHelper
+    delegate :select, :fill_in, to: :context
+
+    def initialize(prefix, context)
+      @prefix = prefix
+      @context = context
+    end
+
+    def fill_in_text_field(field, value)
+      fill_in "#{ prefix }_#{ field }", with: value
+    end
+
+    def select_date(field, date)
+      select date.year, from: :"#{ prefix }_#{ field }_1i"
+      select date.strftime('%B'), from: :"#{ prefix }_#{ field }_2i"
+      select date.day, from: :"#{ prefix }_#{ field }_3i"
+    end
+
+    def select_from_dropdown(field, value)
+      select value, from: :"#{ prefix }_#{ field }"
+    end
+
+    private
+
+    attr_reader :prefix, :context
   end
 end
