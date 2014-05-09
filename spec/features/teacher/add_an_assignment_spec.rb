@@ -10,12 +10,8 @@ feature 'teacher adding an assignment' do
     select 'Science', from: :assignment_course_id
     fill_in :assignment_name, with: 'Pop Quiz'
     fill_in :assignment_description, with: 'I hope you studied!'
-    select '2014', from: :assignment_assigned_on_1i
-    select 'January', from: :assignment_assigned_on_2i
-    select '15', from: :assignment_assigned_on_3i
-    select '2014', from: :assignment_due_on_1i
-    select 'January', from: :assignment_due_on_2i
-    select '17', from: :assignment_due_on_3i
+    select_date(:assignment, :assigned_on, 'January 15, 2014')
+    select_date(:assignment, :due_on, 'January 17, 2014')
     fill_in :assignment_points_possible, with: 100
     click_button I18n.t('helpers.submit.create', model: 'Assignment')
 
@@ -26,5 +22,12 @@ feature 'teacher adding an assignment' do
     expect(page).to have_content('Assigned on: January 15, 2014')
     expect(page).to have_content('Due on: January 17, 2014')
     expect(page).to have_content('Points possible: 100')
+  end
+
+  def select_date(prefix, field, date)
+    parsed_date = Date.parse(date)
+    select parsed_date.year, from: :"#{ prefix }_#{ field }_1i"
+    select parsed_date.strftime('%B'), from: :"#{ prefix }_#{ field }_2i"
+    select parsed_date.day, from: :"#{ prefix }_#{ field }_3i"
   end
 end
